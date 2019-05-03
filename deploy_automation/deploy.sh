@@ -3,12 +3,14 @@
 #Yeah, I know this could have been a lot better and used an actual deploy system.
 #idc. I want level 7. pls.
 
+DEBIAN_FRONTEND=noninteractive
+
 apt -y update
 apt -y upgrade
 
 #Create user and add to sudo
 
-adduser cbagdon
+useradd -p $(openssl passwd -1 password) cbagdon
 adduser cbagdon sudo
 
 #Copy over dummy netplan YML config and apply the settings
@@ -24,7 +26,7 @@ apt -y install openssh-server
 
 rm -rf /etc/ssh/sshd_config
 cp assets/sshd/sshd_config /etc/ssh/
-ssh-keygen
+yes "y" | ssh-keygen -q -n "" > /dev/null
 mkdir ~/.ssh
 cat assets/ssh/id_rsa.pub > ~/.ssh/authorized_keys
 
@@ -43,7 +45,7 @@ service fail2ban restart
 
 #Copy and set up cron scripts for updating packages and detecting crontab changes
 
-apt install mailutils
+apt -y install mailutils
 
 cp -r assets/scripts /home/cbagdon
 { crontab -l -u cbagdon; echo '0 4 * * SUN /home/cbagdon/scripts/update_script.sh'; } | crontab -u cbagdon -
@@ -55,9 +57,12 @@ cp -r assets/scripts /home/cbagdon
 apt -y install nginx
 
 rm -rf /var/www/html/index.nginx-debian.html
-cp assets/nginx/index.nginx-debian.html
+cp assets/nginx/index.nginx-debian.html /var/www/html/
 
 #Set up SSL
+yes "y" | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt \
+	-subj "/C=US/ST=California/L=Fremont/O=42 Silicon Valley/OU=Student/CN=localhost"
+yes "y" | openssl dhparam -dsaparam -out /etc/nginx/dhparam.pem 4096
 cp assets/ssl/self-signed.conf /etc/nginx/snippets/
 cp assets/ssl/ssl-params.conf /etc/nginx/snippets/
 
