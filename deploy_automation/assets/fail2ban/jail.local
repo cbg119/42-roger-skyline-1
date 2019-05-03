@@ -1,0 +1,21 @@
+[sshd]
+enabled = true
+port = 2222
+filter = sshd
+bantime = 1m
+findtime = 1m
+maxretry = 3
+
+[portscan]
+enabled  = true
+filter   = portscan
+bantime = 1m
+findtime = 1m
+maxretry = 1
+
+[nginx-dos]
+enabled = true
+filter = nginx-dos
+bantime = 10s
+findtime = 1m
+maxretry = 1
