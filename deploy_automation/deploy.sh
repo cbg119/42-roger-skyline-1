@@ -26,7 +26,7 @@ apt -y install openssh-server
 
 rm -rf /etc/ssh/sshd_config
 cp assets/sshd/sshd_config /etc/ssh/
-yes "y" | ssh-keygen -q -n "" > /dev/null
+yes "y" | ssh-keygen -q -N "" > /dev/null
 mkdir ~/.ssh
 cat assets/ssh/id_rsa.pub > ~/.ssh/authorized_keys
 
